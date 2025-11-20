@@ -1,3 +1,5 @@
+import java.util.List;
+
 public class App {
 
     public static void main(String[] args) throws Exception {
@@ -6,9 +8,52 @@ public class App {
         // executeReversePrint();
 
         // 替换空格
-        executeReplaceSpace();
+//        executeReplaceSpace();
+
+
+//        App.testHash();
+//        App.testTwoPointers();
+
+
+
 
     }
+
+    private static void testHash() {
+        HashUtils hashUtils = new HashUtils();
+//        // 测试数据
+//        int[] nums = {0,3,7,2,5,8,4,6,0,1};
+//        // 调用方法
+//        int result = hashUtils.longestConsecutive(nums);
+
+        String[] strs = {"eat", "tea", "tan", "ate", "nat", "bat"};
+        List<List<String>> result = hashUtils.groupAnagrams(strs);
+    }
+
+    private static  void testTwoPointers() {
+        TwoPointerUtils twoPointerUtils = new TwoPointerUtils();
+
+//        int[] nums = {0,1,0,3,12};
+//        twoPointerUtils.moveZeroes(nums);
+
+//        int[] nums = {2,3,4,5,18,17,6};
+//        int result = twoPointerUtils.maxArea(nums);
+
+//        int[] nums = {0,0,0,0};
+//        twoPointerUtils.threeSum(nums);
+
+        int[] nums = {4,2,0,3,2,5};
+        int result = twoPointerUtils.trap(nums);
+    }
+
+
+
+
+
+
+
+
+
 
 
 
