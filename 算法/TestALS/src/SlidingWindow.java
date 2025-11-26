@@ -1,7 +1,5 @@
 import java.util.*;
 
-import static java.lang.System.in;
-
 public class SlidingWindow {
 
     public static void main(String args[]) {
@@ -11,8 +9,8 @@ public class SlidingWindow {
 //        int result = test.lengthOfLongestSubstring(s);
 
 
-        String s = "cbaebabacd";
-        String p = "abc";
+        String s = "abab";
+        String p = "ab";
 
         List<Integer> result = test.findAnagrams(s, p);
 
@@ -73,55 +71,101 @@ public class SlidingWindow {
 
     // 找到字符串中所有字母异位词 https://leetcode.cn/problems/find-all-anagrams-in-a-string/description/?envType=study-plan-v2&envId=top-100-liked
     public List<Integer> findAnagrams(String s, String p) {
-        // 需要一个set检查字符
-        // 以窗口长度是否为p的长度作为判定是否全在的标准
-        // 出现第一个全在的，输出l ，然后l++, 再看下一个是不是也是
-        // 出现第一个单个字母在的，r++检查，直到length == set.size
-        // 出现第一个不在的l = 不在+1，r = l
+        // 法1:定长解法
+        // key1：定长滑动窗口
+        // key2: 用ASCII码来确定数组下标
         List<Integer> result = new ArrayList<>();
-        if (p.length() == 0) {
+
+        // 边界条件检查
+        if (s == null || p == null || s.length() < p.length()) {
             return result;
         }
 
-        int l = 0;
-        int r = 0;
-        Set<Character> pSets = new HashSet<>();
-        char[] sChars = s.toCharArray();
-        for (char target : p.toCharArray()) {
-            pSets.add(target);
+        // pCount用于存储目标字符串p的字符统计
+        // sCount用于存储滑动窗口内的字符统计
+        int[] pCount = new int[26];
+        int[] sCount = new int[26];
+
+        // 1. 统计 p 的字符
+        for (char c : p.toCharArray()) {
+            pCount[c - 'a']++;
         }
-        while(r < s.length()) {
-            // 1、窗口固定为p的长度检查
-            // 2、符合标准，窗口右移
-            while (!pSets.isEmpty()) {
-                if (r == s.length()) {
-                    // 退出条件：最后一个字符也检查过了, 不满足条件
-                    return result;
-                }
-                // 没符合标准就挨着找
-                if (pSets.contains(sChars[r])) {
-                    // 去重（每使用一个就删除一个）
-                    pSets.remove(sChars[r]);
-                    // 包含一个，右指针+1
-                    r++;
-                } else {
-                    // 当前不包含
-                    l = ++r;
-                    // 更新去重集
-                    for (char target : p.toCharArray()) {
-                        pSets.add(target);
-                    }
-                }
-            }
-            // 检查完符合标准长度了，添加到结果集
-            result.add(l);
-            // 补充最新的去重集
-            for (int i = l + 1; i < r; i++) {
-                pSets.add(sChars[i]);
-            }
-            // 进位
-            l++;
+
+        int pLen = p.length();
+        int sLen = s.length();
+
+        // 2. 初始化 s 的第一个窗口
+        for (int i = 0; i < pLen; i++) {
+            sCount[s.charAt(i) - 'a']++;
         }
+
+        // 3. 检查第一个窗口是否匹配
+        if (Arrays.equals(pCount, sCount)) {
+            result.add(0);
+        }
+
+        // 4. 滑动窗口：i 代表即将移除的左边界字符的索引
+        // i + pLen 代表即将加入的右边界字符的索引
+        for (int i = 0; i < sLen - pLen; i++) {
+            // 移除左边的字符
+            sCount[s.charAt(i) - 'a']--;
+            // 加入右边的字符
+            sCount[s.charAt(i + pLen) - 'a']++;
+
+            // 比较两个数组是否相同 (i + 1 是当前窗口的起始位置)
+            if (Arrays.equals(pCount, sCount)) {
+                result.add(i + 1);
+            }
+        }
+
         return result;
+
+
+
+        // 法2 key：🌟下面这个是个变长的解法，定长的解法更好理解
+        // 一个hashMap key是p的字符，value是当前滑动窗口字符匹配上的位置
+//        char[] pChars = p.toCharArray();
+//        HashMap<Character, Integer> pMap = new HashMap<>();
+//        for (char pChar : pChars) {
+//            pMap.put(pChar, -1);
+//        }
+//        List<Integer> result = new ArrayList<>();
+//
+//        // 左右指针开始构建滑动窗口
+//        int left = 0;
+//        int right = 0;
+//        char[] sChars = s.toCharArray();
+//        while (right < sChars.length) {
+//            // 构建窗口
+//            if (right - left < p.length()) {
+//                char currentRightValue = sChars[right];
+//                // 匹配上了
+//                if (pMap.containsKey(currentRightValue)) {
+//                    int location = pMap.get(currentRightValue);
+//                    if (location >= left && location <= right) {   // 🌟 去重
+//                        // 在当前窗口范围里，说明出现过，当前窗口出现重复
+//                        // 更新位置，左指针进1,右指针也要+1
+//                        pMap.put(currentRightValue, right);
+//                        left++;
+//                        right++;
+//                    } else {
+//                        // 不在当前窗口范围里，说明之前没出现过，右指针+1
+//                        pMap.put(currentRightValue, right);
+//                        right++;
+//                    }
+//                } else {
+//                    // 没匹配上，左窗口和右窗口重置到相同右窗口+1位置
+//                    left = ++right;
+//                }
+//            }
+//            // 挪动窗口（窗口长度 == 当前目标长度的时候）
+//            // 说明匹配上了 ，左指针++
+//            if (right - left == p.length()) {
+//                result.add(left);
+//                left++;
+//            }
+//        }
+//        return result;
+
     }
 }
