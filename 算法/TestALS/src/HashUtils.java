@@ -2,6 +2,33 @@ import java.util.*;
 
 public class HashUtils {
 
+        // 1. 两数之和 https://leetcode.cn/problems/two-sum/?envType=study-plan-v2&envId=top-100-liked
+        // 法1: 头尾指针双层循环
+        // public int[] twoSum(int[] nums, int target) {
+        //     int rear = nums.length - 1;
+        //     while (rear > 0) {
+        //         for (int front = 0; front < rear; front++) {
+        //             if (nums[front] + nums[rear] == target) {
+        //                 return new int[]{front, rear};
+        //             }
+        //         }
+        //         rear--;
+        //     }
+        //     return new int[0];
+        // }
+        // 法2：hashmap匹配
+        public int[] twoSum(int[] nums, int target) {
+            // key是当前值， value是其下标 --> 因为一定是一前一后 所以一定可以一次找到
+            HashMap<Integer, Integer> indexMap = new HashMap<Integer, Integer>();
+            for (int front = 0; front < nums.length; front++) {
+                if (indexMap.containsKey(target - nums[front])) {
+                    return new int[]{front, indexMap.get(target - nums[front])};
+                }
+                indexMap.put(nums[front], front);
+            }
+            return new int[0];
+        }
+
         // 128. 最长连续序列 https://leetcode.cn/problems/longest-consecutive-sequence/submissions/677422221/?envType=study-plan-v2&envId=top-100-liked
         public int longestConsecutive(int[] nums) {
 
@@ -54,7 +81,7 @@ public class HashUtils {
 
 
 
-            // ✅  🌟 使用HashSet来获取O（1）时间的查找
+            // ✅  🌟 （因为不要求原数组连续）使用HashSet来获取O（1）时间的查找
 
             // 处理空数组情况
             if (nums.length == 0) {
@@ -66,7 +93,7 @@ public class HashUtils {
             }
 
             // 遍历hashSet查找最长值
-            int resultAddCount = -1;
+            int resultAddCount = 0;
             for (int num : hashSet) {
                 if (hashSet.contains(num - 1)) {
                     //  🌟 不是起点（有前序）的直接排除，因为前序的一定会包含后面的（避免大量重复计算）
@@ -76,17 +103,15 @@ public class HashUtils {
                 while (hashSet.contains(++num)) {
                     currentAddCount++;
                 }
-                if (currentAddCount > resultAddCount) {
-                    resultAddCount = currentAddCount;
-                }
-
+                resultAddCount = Math.max(resultAddCount, currentAddCount);
             }
             return resultAddCount + 1;  // 这里要加一下自己
         }
 
     // 49. 字母异位词分组  https://leetcode.cn/problems/group-anagrams/description/?envType=study-plan-v2&envId=top-100-liked
     public List<List<String>> groupAnagrams(String[] strs) {
-        // 1、先获取输入的每个内容的字符信息（按升序排列） key为字符信息，value为值列表
+            // key：利用hashmap 存储 【🌟排序后】的字符串 比较并匹配
+        // 1、先获取输入的每个内容的字符信息（【按升序排列】） key为字符信息，value为值列表
         Map<String, List<String>> infoMap = new HashMap<String, List<String>>();
         for (String str : strs) {
             char[] array = str.toCharArray();
@@ -96,7 +121,7 @@ public class HashUtils {
             list.add(str);
             infoMap.put(key, list);
         }
-        // 2、然后输出
+        // 2、然后输出所有values
         return new ArrayList<List<String>>(infoMap.values());
     }
 }

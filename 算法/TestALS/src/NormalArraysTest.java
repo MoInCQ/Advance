@@ -1,14 +1,11 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
-public class NormalArrays {
+public class NormalArraysTest {
     public static void main(String args[]) {
-        NormalArrays normalArrays = new NormalArrays();
+        NormalArraysTest normalArraysTest = new NormalArraysTest();
 
         int[] param = {-2,1,-3,4,-1,2,1,-5,4};
-        int result = normalArrays.maxSubArray(param);
+        int result = normalArraysTest.maxSubArray(param);
     }
 
     // 最大子数组和 https://leetcode.cn/problems/maximum-subarray/description/?envType=study-plan-v2&envId=top-100-liked
@@ -17,7 +14,7 @@ public class NormalArrays {
         // 法1 动态规划
         // 动态规划转移方程为 f(i) = Max(f(i - 1) + nums[i], num[i])
 
-        // 假设我们正在遍历数组，当前遍历到元素 num。我们需要做一个决策：
+        // 假设我们正在遍历数组，当前遍历到元素 num。我们需要做一个决策： 【前面的还要不要】
         //  1、加入之前的序列：如果前面的子数组和是正数（比如 preSum > 0），那么加上当前元素 num 后，总和肯定比单拿 num 大。所以我们选择“接上”前面的队伍。
         //  2、另起炉灶：如果前面的子数组和是负数（preSum < 0），加上它只会拖累当前的元素 num（让和变小）。所以即使 num 也是负数，抛弃前面的负债自己重新开始计数，结果也会更好。
 
@@ -30,7 +27,7 @@ public class NormalArrays {
             // 找到当前轮次最大的
             preMaxResult = Math.max(preMaxResult + num, num);
             // 计算全局最大方案
-            result = Math.max(result, preMaxResult);
+            result = Math.max(result, preMaxResult);             // 避免出现    1  2  3  -10  4  这样的case 所以需要一个全局最大
         }
         return result;
 
@@ -116,17 +113,19 @@ public class NormalArrays {
             }
         });
         // 2、再合并区间输出
-        List<int[]> result = new ArrayList<>();
+        LinkedList<int[]> result = new LinkedList<>();
         for (int i = 0; i < intervals.length; i++) {
             if (result.isEmpty()) {
                 // 没值新开一个
                 result.add(intervals[i]);
                 continue;
             }
-            int[] currentInterval = result.getLast();
+            // 当前递归值
             int l = intervals[i][0];
             int r = intervals[i][1];
-            // 有值则比较右侧即可（左侧是升序的） (左侧不是升序则右五种可能 ，是升序只剩三种)
+            // 当前合并源
+            int[] currentInterval = result.getLast();
+            // 有值则比较右侧即可（左侧是升序的） (左侧不是升序则有五种可能 ，是升序只剩三种)   🌟 根据相交情况写结果
             if (currentInterval[1] >= r) {
                 // （1）新值在当前值内，不处理
                 continue;
@@ -146,7 +145,27 @@ public class NormalArrays {
 
     // 除自身以外数组的乘积 https://leetcode.cn/problems/product-of-array-except-self/description/?envType=study-plan-v2&envId=top-100-liked
     public int[] productExceptSelf(int[] nums) {
-
+        // 🌟构建i位置左右乘积和数组，然后再计算left[i] * right[i] = ans[i]
+        int leftResult = 1;                     // 构建一个特殊值 ， 第0个位置左边是1
+        int[] leftArr = new int[nums.length];
+        leftArr[0] = leftResult;
+        int rightResult = 1;
+        int[] rightArr = new int[nums.length];
+        rightArr[nums.length - 1] = rightResult;
+        for (int i = 1; i < nums.length; i++) {
+            leftResult *= nums[i - 1];
+            leftArr[i] = leftResult;
+        }
+        for (int j = nums.length - 2; j >= 0; j--) {
+            rightResult *= nums[j + 1];
+            rightArr[j] = rightResult;
+        }
+        // 算结果
+        int[] ans = new int[nums.length];
+        for (int x = 0; x < nums.length; x++) {
+            ans[x] = leftArr[x] * rightArr[x];
+        }
+        return ans;
     }
 
 

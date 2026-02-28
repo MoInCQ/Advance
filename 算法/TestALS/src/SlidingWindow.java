@@ -40,7 +40,7 @@ public class SlidingWindow {
         // 法2: 滑动窗口（利用之前查过的内容 O（n）时间，O（n）空间） ✅
         char[] array = s.toCharArray();
         int result = 0;
-        HashMap<Character, Integer> map = new HashMap<>();  // 仅做不重复检查用（O（1）时间查找） key：字符，value：字符所在下标
+        HashMap<Character, Integer> map = new HashMap<>();  // 🌟做不重复检查用（O（1）时间查找） key：字符，value：字符所在下标
         int l = 0;
         int r = 0;
         // 只要右指针没走到头，就不算结束
@@ -94,12 +94,12 @@ public class SlidingWindow {
         int pLen = p.length();
         int sLen = s.length();
 
-        // 2. 初始化 s 的第一个窗口
+        // 2. 初始化 s 的第一个窗口    key3 ： 第一个窗口要手动创建一下
         for (int i = 0; i < pLen; i++) {
             sCount[s.charAt(i) - 'a']++;
         }
 
-        // 3. 检查第一个窗口是否匹配
+        // 3. 检查第一个窗口是否匹配  key4: 通过Arrays.equals 匹配两个数组是否相同
         if (Arrays.equals(pCount, sCount)) {
             result.add(0);
         }
